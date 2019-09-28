@@ -17,6 +17,7 @@ class ClockView: UIView {
     
     var timeCount = 0 {
         didSet {
+            timeCount = max(0, timeCount)
             timeLabel.text = self.timeCount.toTimer()
         }
     }

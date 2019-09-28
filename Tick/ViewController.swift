@@ -63,9 +63,6 @@ class ViewController: UIViewController {
         switch state {
         case .picking:
             
-            print("HEREE Pressed")
-            timeOut()
-            
             state = .running
             clockView.setCountDown()
             countDown()
@@ -84,7 +81,7 @@ class ViewController: UIViewController {
 
     
     private func setStartButtonAppearance() {
-        print(self.state)
+
         switch self.state {
         case .picking:
             startButton.setTitle("Start", for: .normal)
@@ -102,20 +99,22 @@ class ViewController: UIViewController {
         }
     }
     
+    var reminderSound: AVAudioPlayer? = AVAudioPlayer()
     func timeOut() {
         timer.invalidate()
+        state = .picking
+        let dir = "Audio/singing_bowl"
         
-        print("HEREE TIMEOUT")
-        let path = Bundle.main.path(forResource: "singing_bowl.ogg", ofType:nil)!
-        print("Path: \(path)")
-        let url = URL(fileURLWithPath: path)
-        
-        var bombSoundEffect: AVAudioPlayer? = AVAudioPlayer()
-        do {
-            bombSoundEffect = try AVAudioPlayer(contentsOf: url)
-            bombSoundEffect?.play()
-        } catch {
-            print("Couldn't load file")
+        if let path = Bundle.main.path(forResource: dir, ofType: "mp3") {
+            let url = URL(fileURLWithPath: path)
+            
+            do {
+                reminderSound = try AVAudioPlayer(contentsOf: url)
+//                reminderSound?.setVolume(1000, fadeDuration: 100)
+                reminderSound?.play()
+            } catch {
+                print("Couldn't load file")
+            }
         }
         
     }
