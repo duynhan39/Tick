@@ -1,5 +1,7 @@
 # Tick
+<p align="center">
 <img src="./Tick/tick.svg" width="350">
+</p>
 
 A timer app with a more gentle reminder
 
