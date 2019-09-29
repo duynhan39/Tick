@@ -33,10 +33,10 @@ class ViewController: UIViewController {
         }
     }
     
+    var reminderSound: AVAudioPlayer!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-//
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -44,13 +44,25 @@ class ViewController: UIViewController {
         
         cancelButton.layer.cornerRadius = cancelButton.frame.height/2
         cancelButton.setBackgroundColor(color: UIColor.darkGray, forState: UIControl.State.normal)
-        
         cancelButton.setBackgroundColor(color: #colorLiteral(red: 0.1298420429, green: 0.1298461258, blue: 0.1298439503, alpha: 1), forState: UIControl.State.disabled)
         
         cancelButton.titleLabel?.textColor = UIColor.white
         
-        
         startButton.layer.cornerRadius = startButton.frame.height/2
+        
+        
+        let dir = "singing_bowl"
+        if let path = Bundle.main.path(forResource: dir, ofType: "mp3") {
+            print(path)
+            let url = URL(fileURLWithPath: path)
+            do {
+                reminderSound = try AVAudioPlayer(contentsOf: url)
+                reminderSound?.setVolume(800, fadeDuration: 100)
+                
+            } catch {
+                print("Couldn't load file")
+            }
+        }
     }
     
     @IBAction func pressedCancel(_ sender: UIButton) {
@@ -81,7 +93,6 @@ class ViewController: UIViewController {
 
     
     private func setStartButtonAppearance() {
-
         switch self.state {
         case .picking:
             startButton.setTitle("Start", for: .normal)
@@ -95,28 +106,7 @@ class ViewController: UIViewController {
             startButton.setTitle("Resume", for: .normal)
             startButton.setBackgroundColor(color: #colorLiteral(red: 0.3084011078, green: 0.4650763755, blue: 0, alpha: 1), forState: .normal)
             startButton.setTitleColor(#colorLiteral(red: 0.5563425422, green: 0.9793455005, blue: 0, alpha: 1), for: .normal)
-            return
         }
-    }
-    
-    var reminderSound: AVAudioPlayer? = AVAudioPlayer()
-    func timeOut() {
-        timer.invalidate()
-        state = .picking
-        let dir = "Audio/singing_bowl"
-        
-        if let path = Bundle.main.path(forResource: dir, ofType: "mp3") {
-            let url = URL(fileURLWithPath: path)
-            
-            do {
-                reminderSound = try AVAudioPlayer(contentsOf: url)
-//                reminderSound?.setVolume(1000, fadeDuration: 100)
-                reminderSound?.play()
-            } catch {
-                print("Couldn't load file")
-            }
-        }
-        
     }
     
     func countDown() {
@@ -128,23 +118,23 @@ class ViewController: UIViewController {
                 self.timeOut()
             }
         }
+        RunLoop.current.add(timer, forMode: RunLoop.Mode.common)
+        UIApplication.shared.isIdleTimerDisabled = true
     }
     
-    
-    
-    
-    
-    
-    
+    func timeOut() {
+        timer.invalidate()
+        state = .picking
 
-
-    
-
-//    let timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: false) {
-//        timer in
-//    }
-
-
+        do {
+           try AVAudioSession.sharedInstance().setCategory(.playback)
+        } catch(let error) {
+            print(error.localizedDescription)
+        }
+        
+        reminderSound?.play()
+        UIApplication.shared.isIdleTimerDisabled = false
+    }
 }
 
 extension UIButton {
